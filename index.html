@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khám phá tính chất hóa học của kim loại kiềm với nước</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      display: flex;
+    }
+
+    /* BỐ CỤC 2/3 BÊN TRÁI */
+    .left-panel {
+      width: 66.66%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 24px;
+      position: relative;
+    }
+
+    /* Thanh điều khiển nhạc */
+    .audio-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .btn-audio {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #d1d5db;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+    }
+
+    .btn-audio:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .audio-status {
+      font-size: 13px;
+      color: #4b5563;
+      font-style: italic;
+    }
+
+    /* Tiêu đề thí nghiệm */
+    .titles-container {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .line-1 {
+      font-size: 21px;
+      font-weight: 800;
+      color: #1e3a8a;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .line-2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0369a1;
+      margin-top: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Khu vực giá đỡ và 3 ống nghiệm */
+    .lab-stage {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding-bottom: 45px;
+      gap: 55px;
+      position: relative;
+    }
+
+    .test-tube-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .tube-label {
+      font-size: 17px;
+      font-weight: 800;
+      color: #1f2937;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 3px 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+
+    .test-tube {
+      width: 74px;
+      height: 330px;
+      border: 3.5px solid rgba(120, 144, 156, 0.9);
+      border-top: none;
+      border-bottom-left-radius: 37px;
+      border-bottom-right-radius: 37px;
+      position: relative;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(224, 242, 254, 0.15));
+      box-shadow: inset 0 0 10px rgba(148, 163, 184, 0.25), 0 8px 18px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    /* Hiệu ứng vành miệng ống nghiệm */
+    .test-tube::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -6px;
+      right: -6px;
+      height: 8px;
+      border: 3px solid rgba(120, 144, 156, 0.9);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.7);
+    }
+
+    /* Lớp nước */
+    .water-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 0%;
+      background: linear-gradient(to top, rgba(56, 189, 248, 0.55), rgba(186, 230, 253, 0.4));
+      border-bottom-left-radius: 33px;
+      border-bottom-right-radius: 33px;
+      transition: height 1s ease-in-out;
+    }
+
+    /* Kim loại và phản ứng */
+    .metal-entity {
+      position: absolute;
+      z-index: 10;
+      display: none;
+    }
+
+    /* Lithium: góc cạnh, sủi bọt êm dịu */
+    .metal-li {
+      width: 14px;
+      height: 14px;
+      background: #94a3b8;
+      border: 1px solid #475569;
+      clip-path: polygon(15% 0%, 90% 10%, 100% 85%, 20% 100%, 0% 40%);
+      left: calc(50% - 7px);
+      bottom: 185px;
+    }
+
+    /* Sodium: vo tròn, chạy ngoằn ngoèo */
+    .metal-na {
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 35% 35%, #f1f5f9, #94a3b8 75%);
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(255,255,255,0.8);
+      left: calc(50% - 7px);
+      bottom: 185px;
+    }
+
+    .moving-na {
+      animation: zigZag 0.7s infinite alternate ease-in-out;
+    }
+
+    @keyframes zigZag {
+      0% { transform: translateX(-20px); }
+      100% { transform: translateX(20px); }
+    }
+
+    /* Potassium: vo tròn bốc cháy tím */
+    .metal-k {
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle at 35% 35%, #e2e8f0, #64748b 75%);
+      border-radius: 50%;
+      left: calc(50% - 7px);
+      bottom: 185px;
+    }
+
+    .moving-k {
+      animation: quickJitter 0.18s infinite alternate;
+    }
+
+    @keyframes quickJitter {
+      0% { transform: translate(-22px, -1px); }
+      100% { transform: translate(22px, 1px); }
+    }
+
+    /* Lửa tím của Kali */
+    .flame-k {
+      position: absolute;
+      bottom: 10px;
+      left: -8px;
+      width: 30px;
+      height: 42px;
+      background: radial-gradient(circle at 50% 80%, #d8b4fe 15%, #a855f7 60%, transparent 80%);
+      border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+      filter: drop-shadow(0 0 10px #9333ea);
+      animation: flameFlicker 0.12s infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes flameFlicker {
+      0% { transform: scale(0.9) skewX(-2deg); opacity: 0.9; }
+      100% { transform: scale(1.15) skewX(2deg); opacity: 1; }
+    }
+
+    /* Khói trắng */
+    .smoke-container {
+      position: absolute;
+      bottom: 195px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 120px;
+      pointer-events: none;
+      display: none;
+    }
+
+    .smoke-puff {
+      position: absolute;
+      background: rgba(241, 245, 249, 0.75);
+      border-radius: 50%;
+      filter: blur(5px);
+      animation: riseSmoke 1.6s infinite ease-out;
+    }
+
+    @keyframes riseSmoke {
+      0% { transform: translateY(0) scale(0.4); opacity: 0.8; }
+      100% { transform: translateY(-110px) scale(1.6); opacity: 0; }
+    }
+
+    /* Bọt khí sủi */
+    .bubble {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 50%;
+      border: 1px solid rgba(186, 230, 253, 0.9);
+      animation: floatUp 1.2s infinite linear;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-160px); opacity: 0; }
+    }
+
+    /* BỐ CỤC 1/3 BÊN PHẢI (Bảng điều khiển 3D màu vàng nhạt) */
+    .right-panel {
+      width: 33.34%;
+      height: 100%;
+      padding: 20px;
+      display: flex;
+    }
+
+    .control-board-3d {
+      width: 100%;
+      height: 100%;
+      background: #fef9c3; /* Vàng nhạt */
+      border-radius: 26px;
+      border: 3px solid #fde047;
+      box-shadow: 
+        0 14px 28px rgba(180, 83, 9, 0.15),
+        0 10px 10px rgba(180, 83, 9, 0.08),
+        inset 0 2px 4px rgba(255, 255, 255, 0.9),
+        inset 0 -6px 12px rgba(234, 179, 8, 0.25);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .board-header {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #15803d; /* Xanh lá */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 2px dashed #fde047;
+    }
+
+    .reagents-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    /* Khối nút bấm hóa chất */
+    .action-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 2px solid #fef08a;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .action-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(202, 138, 4, 0.18);
+      border-color: #facc15;
+    }
+
+    .action-card:active {
+      transform: translateY(1px);
+    }
+
+    .action-card.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      pointer-events: none;
+      filter: grayscale(0.5);
+    }
+
+    .card-icon {
+      font-size: 32px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fefce8;
+      border-radius: 12px;
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    /* Nút Làm lại thí nghiệm */
+    .btn-reset {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 6px 14px rgba(220, 38, 38, 0.35);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(220, 38, 38, 0.45);
+    }
+
+    .btn-reset:active {
+      transform: translateY(1px);
+    }
+
+    .log-banner {
+      font-size: 12px;
+      background: rgba(255,255,255,0.7);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #854d0e;
+      text-align: center;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INPUT ẨN CHỌN ALBUM / FILE NHẠC TỰ CHỌN -->
+  <input type="file" id="musicFolderInput" webkitdirectory directory multiple accept="audio/mp3,audio/*" style="display: none;">
+
+  <!-- 2/3 BÊN TRÁI MÀN HÌNH -->
+  <div class="left-panel">
+    <!-- Nút Bật/tắt và Mở nhạc trên cùng 1 dòng -->
+    <div class="audio-controls">
+      <button class="btn-audio" id="btnTogglePlay">
+        <span>🌸</span>
+        <span id="txtTogglePlay">Bật/tắt</span>
+      </button>
+
+      <button class="btn-audio" id="btnOpenFolder">
+        <span>🌼</span>
+        <span>Mở nhạc</span>
+      </button>
+
+      <span class="audio-status" id="audioStatusText">Chưa có nhạc nào được phát</span>
+    </div>
+
+    <!-- Tiêu đề dòng 1 & 2 -->
+    <div class="titles-container">
+      <div class="line-1">
+        <span>⚗️</span>
+        <span>KHÁM PHÁ TÍNH CHẤT HÓA HỌC CỦA KIM LOẠI</span>
+        <span>⚗️</span>
+      </div>
+      <div class="line-2">
+        <span>🧪</span>
+        <span>KIM LOẠI KIỀM TÁC DỤNG VỚI NƯỚC</span>
+        <span>🧪</span>
+      </div>
+    </div>
+
+    <!-- Dụng cụ thí nghiệm (3 ống nghiệm thủy tinh trong suốt đứng thẳng kề nhau) -->
+    <div class="lab-stage">
+      <!-- ỐNG 1 -->
+      <div class="test-tube-wrapper">
+        <div class="tube-label">Ống 1</div>
+        <div class="test-tube" id="tube1">
+          <div class="water-layer" id="water1"></div>
+          <div class="metal-entity metal-li" id="metalLi"></div>
+          <div class="smoke-container" id="smokeLi"></div>
+        </div>
+      </div>
+
+      <!-- ỐNG 2 -->
+      <div class="test-tube-wrapper">
+        <div class="tube-label">Ống 2</div>
+        <div class="test-tube" id="tube2">
+          <div class="water-layer" id="water2"></div>
+          <div class="metal-entity metal-na moving-na" id="metalNa"></div>
+          <div class="smoke-container" id="smokeNa"></div>
+        </div>
+      </div>
+
+      <!-- ỐNG 3 -->
+      <div class="test-tube-wrapper">
+        <div class="tube-label">Ống 3</div>
+        <div class="test-tube" id="tube3">
+          <div class="water-layer" id="water3"></div>
+          <div class="metal-entity metal-k moving-k" id="metalK">
+            <div class="flame-k"></div>
+          </div>
+          <div class="smoke-container" id="smokeK"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1/3 BÊN PHẢI MÀN HÌNH (Khung 3D màu vàng nhạt bo viền nổi) -->
+  <div class="right-panel">
+    <div class="control-board-3d">
+      <div class="board-header">
+        <span>🌿</span>
+        <span>Hóa chất thí nghiệm</span>
+        <span>🌿</span>
+      </div>
+
+      <div class="reagents-section">
+        <!-- Bình nước H2O -->
+        <div class="action-card" id="cardWater">
+          <div class="card-icon">🫗</div>
+          <div class="card-info">
+            <div class="card-title">Bình nước (H<sub>2</sub>O)</div>
+            <div class="card-desc" id="waterHint">Nhấp để thêm nước vào Ống 1</div>
+          </div>
+        </div>
+
+        <!-- Lithium -->
+        <div class="action-card disabled" id="cardLi">
+          <div class="card-icon">🔘</div>
+          <div class="card-info">
+            <div class="card-title">Li (Lithium)</div>
+            <div class="card-desc">Cho vào Ống 1</div>
+          </div>
+        </div>
+
+        <!-- Sodium -->
+        <div class="action-card disabled" id="cardNa">
+          <div class="card-icon">⚪</div>
+          <div class="card-info">
+            <div class="card-title">Na (Sodium)</div>
+            <div class="card-desc">Cho vào Ống 2</div>
+          </div>
+        </div>
+
+        <!-- Potasium -->
+        <div class="action-card disabled" id="cardK">
+          <div class="card-icon">🟣</div>
+          <div class="card-info">
+            <div class="card-title">K (Potasium)</div>
+            <div class="card-desc">Cho vào Ống 3</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log-banner" id="statusMessage">
+        Vui lòng cấp nước vào ống nghiệm trước khi cho kim loại.
+      </div>
+
+      <!-- Nút làm lại thí nghiệm ở dòng dưới cùng -->
+      <button class="btn-reset" id="btnReset">🔄 Làm lại thí nghiệm</button>
+    </div>
+  </div>
+
+  <script>
+    // --- KHỞI TẠO TRẠNG THÁI VÀ PHẦN TỬ ---
+    let waterStep = 0; // 0: chưa có nước, 1: ống 1 có nước, 2: ống 2 có nước, 3: ống 3 có nước
+    const tubeWaterLevels = [false, false, false];
+    const metalReacted = [false, false, false];
+
+    // Đối tượng Audio quản lý nhạc MP3
+    const bgAudio = new Audio();
+    let musicPlaylist = [];
+    let currentTrackIdx = 0;
+
+    const btnTogglePlay = document.getElementById('btnTogglePlay');
+    const btnOpenFolder = document.getElementById('btnOpenFolder');
+    const musicFolderInput = document.getElementById('musicFolderInput');
+    const audioStatusText = document.getElementById('audioStatusText');
+
+    const cardWater = document.getElementById('cardWater');
+    const waterHint = document.getElementById('waterHint');
+    const cardLi = document.getElementById('cardLi');
+    const cardNa = document.getElementById('cardNa');
+    const cardK = document.getElementById('cardK');
+    const btnReset = document.getElementById('btnReset');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // --- QUẢN LÝ ÂM NHẠC & FOLDER ---
+    // Nút mở nhạc -> mở hộp thoại chọn thư mục nhạc MP3
+    btnOpenFolder.addEventListener('click', () => {
+      musicFolderInput.click();
+    });
+
+    musicFolderInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files).filter(f => f.type.startsWith('audio/') || f.name.endsWith('.mp3'));
+      if (files.length > 0) {
+        musicPlaylist = files;
+        currentTrackIdx = 0;
+        playTrack(currentTrackIdx);
+      } else {
+        alert("Không tìm thấy tệp định dạng audio/mp3 nào trong thư mục đã chọn.");
+      }
+    });
+
+    function playTrack(idx) {
+      if (!musicPlaylist[idx]) return;
+      const file = musicPlaylist[idx];
+      bgAudio.src = URL.createObjectURL(file);
+      bgAudio.play().then(() => {
+        audioStatusText.textContent = `Đang phát: ${file.name}`;
+      }).catch(err => {
+        console.log("Cần tương tác người dùng để phát nhạc:", err);
+      });
+    }
+
+    bgAudio.addEventListener('ended', () => {
+      currentTrackIdx = (currentTrackIdx + 1) % musicPlaylist.length;
+      playTrack(currentTrackIdx);
+    });
+
+    // Nút Bật/tắt: nếu đang phát thì tắt, đang tắt thì phát
+    btnTogglePlay.addEventListener('click', () => {
+      if (!bgAudio.src) {
+        alert("Chưa chọn album nhạc. Vui lòng bấm '🌼 Mở nhạc' để chọn thư mục chứa tệp mp3!");
+        return;
+      }
+      if (bgAudio.paused) {
+        bgAudio.play();
+        audioStatusText.textContent = `Đang phát: ${musicPlaylist[currentTrackIdx]?.name || 'Nhạc nền'}`;
+      } else {
+        bgAudio.pause();
+        audioStatusText.textContent = "Nhạc đang tạm dừng";
+      }
+    });
+
+    // --- QUẢN LÝ BÌNH NƯỚC (H2O) ---
+    cardWater.addEventListener('click', () => {
+      if (waterStep === 0) {
+        // Cho nước vào ống 1
+        document.getElementById('water1').style.height = '60%';
+        tubeWaterLevels[0] = true;
+        cardLi.classList.remove('disabled');
+        waterStep = 1;
+        waterHint.textContent = "Nhấp để thêm nước vào Ống 2";
+        statusMessage.textContent = "Đã thêm nước vào Ống 1. Bạn có thể cho Li vào Ống 1!";
+      } else if (waterStep === 1) {
+        // Cho nước vào ống 2
+        document.getElementById('water2').style.height = '60%';
+        tubeWaterLevels[1] = true;
+        cardNa.classList.remove('disabled');
+        waterStep = 2;
+        waterHint.textContent = "Nhấp để thêm nước vào Ống 3";
+        statusMessage.textContent = "Đã thêm nước vào Ống 2. Bạn có thể cho Na vào Ống 2!";
+      } else if (waterStep === 2) {
+        // Cho nước vào ống 3
+        document.getElementById('water3').style.height = '60%';
+        tubeWaterLevels[2] = true;
+        cardK.classList.remove('disabled');
+        waterStep = 3;
+        waterHint.textContent = "3 ống nghiệm đã đầy đủ nước";
+        cardWater.classList.add('disabled');
+        statusMessage.textContent = "Đã thêm nước vào Ống 3. Bạn có thể cho K vào Ống 3!";
+      }
+    });
+
+    // --- CÁC HÀM HIỆU ỨNG TẠO BỌT KHÍ VÀ KHÓI ---
+    function createBubbles(tubeId, intensity, durationSec) {
+      const tube = document.getElementById(tubeId);
+      const interval = setInterval(() => {
+        for (let i = 0; i < intensity; i++) {
+          const b = document.createElement('div');
+          b.className = 'bubble';
+          const size = Math.random() * 5 + 3;
+          b.style.width = size + 'px';
+          b.style.height = size + 'px';
+          b.style.left = (Math.random() * 50 + 10) + 'px';
+          b.style.bottom = '30px';
+          tube.appendChild(b);
+
+          setTimeout(() => b.remove(), 1200);
+        }
+      }, 200);
+
+      setTimeout(() => clearInterval(interval), durationSec * 1000);
+    }
+
+    function createSmoke(smokeContainerId, puffsPerSec, durationSec) {
+      const container = document.getElementById(smokeContainerId);
+      container.style.display = 'block';
+
+      const interval = setInterval(() => {
+        const p = document.createElement('div');
+        p.className = 'smoke-puff';
+        const size = Math.random() * 20 + 20;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = (Math.random() * 20 + 15) + 'px';
+        p.style.bottom = '0px';
+        container.appendChild(p);
+
+        setTimeout(() => p.remove(), 1600);
+      }, 1000 / puffsPerSec);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        setTimeout(() => { container.style.display = 'none'; }, 1600);
+      }, durationSec * 1000);
+    }
+
+    // --- HIỆN TƯỢNG PHẢN ỨNG CHO TỪNG KIM LOẠI ---
+
+    // 1. LITHIUM (Ống 1): Phản ứng chậm, êm dịu, nổi, giữ nguyên góc cạnh, sủi bọt khí chậm
+    cardLi.addEventListener('click', () => {
+      if (!tubeWaterLevels[0] || metalReacted[0]) return;
+      metalReacted[0] = true;
+      cardLi.classList.add('disabled');
+
+      const li = document.getElementById('metalLi');
+      li.style.display = 'block';
+
+      statusMessage.textContent = "Ống 1: Li nổi, giữ góc cạnh, phản ứng êm dịu, bọt khí H₂ sủi từ từ.";
+      createBubbles('tube1', 2, 7);
+
+      // Li tan dần từ từ sau 7 giây
+      setTimeout(() => {
+        li.style.transition = 'opacity 2s ease, transform 2s ease';
+        li.style.opacity = '0';
+        li.style.transform = 'scale(0.2)';
+        setTimeout(() => {
+          li.style.display = 'none';
+          statusMessage.textContent = "Ống 1: Mẩu Lithium đã tan hết tạo dung dịch LiOH và khí H₂.";
+        }, 2000);
+      }, 5000);
+    });
+
+    // 2. SODIUM (Ống 2): Mãnh liệt, nóng chảy tròn vo, chạy nhanh ngoằn ngoèo, sủi bọt mạnh
+    cardNa.addEventListener('click', () => {
+      if (!tubeWaterLevels[1] || metalReacted[1]) return;
+      metalReacted[1] = true;
+      cardNa.classList.add('disabled');
+
+      const na = document.getElementById('metalNa');
+      na.style.display = 'block';
+
+      statusMessage.textContent = "Ống 2: Na nóng chảy vo tròn thành viên bi, chạy nhanh trên mặt nước, sủi bọt H₂ mạnh!";
+      createBubbles('tube2', 6, 4.5);
+      createSmoke('smokeNa', 3, 4.5);
+
+      // Na tan sau khoảng 4.5 giây
+      setTimeout(() => {
+        na.style.transition = 'opacity 1s ease, transform 1s ease';
+        na.style.opacity = '0';
+        na.style.transform = 'scale(0.1)';
+        setTimeout(() => {
+          na.style.display = 'none';
+          statusMessage.textContent = "Ống 2: Sodium đã phản ứng hết tạo dung dịch kiềm NaOH.";
+        }, 1000);
+      }, 4500);
+    });
+
+    // 3. POTASIUM (Ống 3): Rất mãnh liệt, bốc cháy ngọn lửa tím, khói dày đặc, sủi bọt rất mạnh
+    cardK.addEventListener('click', () => {
+      if (!tubeWaterLevels[2] || metalReacted[2]) return;
+      metalReacted[2] = true;
+      cardK.classList.add('disabled');
+
+      const k = document.getElementById('metalK');
+      k.style.display = 'block';
+
+      statusMessage.textContent = "Ống 3: K phản ứng cực kỳ mãnh liệt, bốc cháy với NGỌN LỬA TÍM, khói dày đặc!";
+      createBubbles('tube3', 10, 3);
+      createSmoke('smokeK', 8, 3.5);
+
+      // K phản ứng chớp nhoáng và cháy hết trong 3 giây
+      setTimeout(() => {
+        k.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        k.style.opacity = '0';
+        k.style.transform = 'scale(0.1)';
+        setTimeout(() => {
+          k.style.display = 'none';
+          statusMessage.textContent = "Ống 3: Potasium đã cháy hết! Mức độ phản ứng tăng dần: Li < Na < K.";
+        }, 600);
+      }, 3000);
+    });
+
+    // --- LÀM LẠI THÍ NGHIỆM ---
+    btnReset.addEventListener('click', () => {
+      // Đặt lại các biến trạng thái
+      waterStep = 0;
+      tubeWaterLevels[0] = false;
+      tubeWaterLevels[1] = false;
+      tubeWaterLevels[2] = false;
+      metalReacted[0] = false;
+      metalReacted[1] = false;
+      metalReacted[2] = false;
+
+      // Xóa nước
+      document.getElementById('water1').style.height = '0%';
+      document.getElementById('water2').style.height = '0%';
+      document.getElementById('water3').style.height = '0%';
+
+      // Ẩn kim loại và khói
+      ['metalLi', 'metalNa', 'metalK'].forEach(id => {
+        const el = document.getElementById(id);
+        el.style.display = 'none';
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+
+      ['smokeLi', 'smokeNa', 'smokeK'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+        document.getElementById(id).innerHTML = '';
+      });
+
+      // Reset các nút điều khiển
+      cardWater.classList.remove('disabled');
+      cardLi.classList.add('disabled');
+      cardNa.classList.add('disabled');
+      cardK.classList.add('disabled');
+      waterHint.textContent = "Nhấp để thêm nước vào Ống 1";
+      statusMessage.textContent = "Đã đặt lại thí nghiệm. Hãy nhấp bình nước H₂O để bắt đầu.";
+    });
+  </script>
+</body>
+</html>
